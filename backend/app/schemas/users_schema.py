@@ -22,3 +22,6 @@ class UserUpdate(BaseModel):
     last_name: Optional[str] 
     username : str = Field(..., min_length=5, max_length=15, description="User username")
 
+class UserChangePassword(BaseModel):
+    user_id: UUID
+    hashed_password :str
