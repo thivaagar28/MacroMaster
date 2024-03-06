@@ -1,0 +1,16 @@
+.bg{
+    box-sizing: border-box;
+    width: 100% !important;
+    height: 100vh;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: linear-gradient(92.31deg,
+                rgba(0, 0, 0, 0.33) -5.69%,
+                rgba(62, 18, 153, 0.33) 16.26%,
+                rgba(49, 8, 137, 0.33) 51.26%,
+                rgba(33, 0, 103, 0.33) 84.18%,
+                rgba(0, 0, 0, 0.33) 108.21%);
+    backdrop-filter: blur(2.5px);
+}
+
