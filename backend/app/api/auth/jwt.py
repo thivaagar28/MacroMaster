@@ -62,6 +62,7 @@ async def refresh_token(refresh_token: str = Body(...)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
+    
     return {
         "access_token": create_access_token(user.user_id),
         "refresh_token": create_refresh_token(user.user_id)
