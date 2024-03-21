@@ -25,3 +25,7 @@ class UserUpdate(BaseModel):
 class UserChangePassword(BaseModel):
     user_id: UUID
     hashed_password :str
+
+class UserPassword(BaseModel):
+    new_password: str
+    old_password: str
