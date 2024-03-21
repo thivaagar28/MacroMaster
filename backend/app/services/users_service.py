@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 import pymongo
 #import database models, schemes
-from app.schemas.users_schema import UserCreate, UserUpdate, UserChangePassword
+from app.schemas.users_schema import UserCreate, UserUpdate, UserChangePassword, UserPassword
 from app.models.users_model import Users
 #import password hashing security function
 from app.core.security import get_hash_password, verify_password
@@ -50,17 +50,17 @@ class UsersService:
         return user
 
     @staticmethod
-    async def change_password(user_id: UUID, old_password: str, new_password: str) -> Users:
+    async def change_password(user_id: UUID, data:UserPassword) -> Users:
         user = await UsersService.get_user_by_id(user_id)
         if not user:
             raise pymongo.errors.OperationFailure("User not found")
         
-        if not verify_password(password=old_password, hashed_pass=user.hashed_password):
+        if not verify_password(password=data.old_password, hashed_pass=user.hashed_password):
             return None
         
         user_pass_instance = UserChangePassword(
             user_id= user.user_id,
-            hashed_password= get_hash_password(new_password)
+            hashed_password= get_hash_password(data.new_password)
         )
 
         await user.update({"$set": user_pass_instance.model_dump(exclude_unset=True)})
