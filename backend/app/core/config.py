@@ -6,8 +6,8 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY : str = config("JWT_SECRET_KEY", cast=str)
     JWT_REFRESH_SECRET_KEY : str = config("JWT_REFRESH_SECRET_KEY", cast=str)
     ALGORITHM  : str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 #1 HOUR
-    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 #7 DAYS
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 5 #5 minutes
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 2 * 60 #120 minutes
     PROJECT_NAME: str = "MacroMaster"
 
     #Database
