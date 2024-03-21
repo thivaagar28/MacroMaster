@@ -7,34 +7,34 @@ import {
     FiSettings
 } from 'react-icons/fi'
 import { NavItem } from './NavItem';
+import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '../../hooks/useAuth';
 
 export const Sidebar = ({collapse, setCollapse}) => {
+  const auth = useAuth();
   return (
     <>
     <Box flexDirection={'column'} alignItems={'baseline'} w={'full'}>
-        <Flex flexDir={'column'} w={'100%'} alignItems={collapse ? 'center' : 'center'}>
-          <IconButton background={'none'} icon={ collapse ? <FiX strokeWidth={3}/> : <FiMenu  strokeWidth={3}/>} fontSize={'2xl'} color={'#d4a600'} onClick={() => {
-            collapse ? setCollapse(false) : setCollapse(true)
-          }}/>
-        </Flex>
-        <NavItem collapse={collapse} icon={FiHome} title={"Dashboard"} description={'Home'}/> {/* Need navigation */}
-        <NavItem collapse={collapse} icon={FiUser} title={"Account"} description={'Account Settings'}/> {/* Need to hide button when guest and navigation */}
-        <NavItem collapse={collapse} icon={FiSettings} title={"Settings"} description={'Application Settings'}/>
+      <Flex flexDir={'column'} w={'100%'} alignItems={collapse ? 'center' : 'center'}>
+        <IconButton background={'none'} icon={ collapse ? <FiX strokeWidth={3}/> : <FiMenu  strokeWidth={3}/>} fontSize={'2xl'} color={'#d4a600'} onClick={() => {
+          collapse ? setCollapse(false) : setCollapse(true)
+        }}/>
+      </Flex>
+      <NavItem collapse={collapse} icon={FiHome} title={"Dashboard"} path='/' />
+      {auth?.isAuthenticated && <><NavItem collapse={collapse} icon={FiUser} title={"Account"} path='/account_settings'/>
+      <NavItem collapse={collapse} icon={FiSettings} title={"Settings"} />
+      </>}
     </Box>
-    <Flex 
-        p={'5%'}
-        flexDir={'column'}
-        w={'100%'}
-        alignItems={collapse ? "center" : 'center'}
-        mb={2}>
-        <Divider mb={4}/>
-        <Flex mt={4} align="center">
-            <Avatar size="sm" src="avatar-1.jpg" />
-            <Flex flexDir="column" ml={4} display={collapse ? "flex" : "none"}>
-                <Heading as="h3" size="sm">Thivaagar Loganathan</Heading> {/* Should be replaced with current user name and email using jwt */}
-                <Text color="gray">thivaagar28@gmail.com</Text>
-            </Flex>
-        </Flex>
+    <Flex p={'5%'} flexDir={'column'}w={'100%'} alignItems={collapse ? "center" : 'center'} mb={2}>
+      {auth?.isAuthenticated && <ThemeToggle collapse={collapse}/>}
+      <Divider mb={4}/>
+      <Flex mt={4} align="center">
+          <Avatar size="sm" src="avatar-1.jpg" />
+          <Flex flexDir="column" ml={4} display={collapse ? "flex" : "none"}>
+              <Heading as="h3" size="sm">{auth?.user ? `${auth.user.first_name} ${auth.user.last_name}` : "Guest"}</Heading>
+              {auth.user && <Text color="gray">{auth.user.email}</Text>}
+          </Flex>
+      </Flex>
     </Flex>
     </>
   )
