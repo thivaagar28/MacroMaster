@@ -67,7 +67,7 @@ export const DefaultLayout = ({children}) => {
             </Tooltip>
           </Flex>
         </Flex>
-        <Flex bg="RGBA(255, 255, 255, 0.24)" h={'full'} borderRadius="2xl" p={2} position={'relative'} justifyContent={'center'} alignItems={'center'}>{children}</Flex>
+        <Flex h={'full'} p={2} position={'relative'} justifyContent={'center'} alignItems={'center'}>{children}</Flex>
         </Flex>
     </HStack>
         
