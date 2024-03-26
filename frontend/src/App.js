@@ -7,6 +7,7 @@ import { AuthRoute } from './components/Auth/AuthRoute';
 import { AuthConsumer, AuthProvider} from './context/JWTAuthContext'
 import { Flex, Spinner } from '@chakra-ui/react';
 import { AccountSettings } from './components/User/AccountSettings';
+import { HomePage } from './components/Home/HomePage';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
             ) : (
               <DefaultLayout>
                 <Routes>
-                <Route path="/" element={<h1>Home content</h1>} />
+                <Route path="/" element={<HomePage/>} />
                 <Route path='*' element={<Navigate to={'/'}/>} />
                 <Route path='/login' element={<PublicRoute><Login/></PublicRoute>}/>
                 <Route path='/register' element={<PublicRoute><Register/></PublicRoute>}/>
