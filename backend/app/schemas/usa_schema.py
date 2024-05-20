@@ -1,0 +1,70 @@
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel
+from beanie import Indexed
+
+class StatPoc1(BaseModel):
+    bcli_poc1 : Optional[float]
+    cpi_poc1 : Optional[float]
+    gdpt_poc1 : Optional[float]
+    grb_poc1 : Optional[float]
+    inf_poc1 : Optional[float]
+    ipi_poc1 : Optional[float]
+    lt_ir_poc1 : Optional[float]
+    ppi_poc1 : Optional[float]
+    st_ir_poc1 : Optional[float]
+    ur_poc1 : Optional[float]
+    wrt_poc1 : Optional[float]
+    dji_close : Optional[float]
+    dji_poc1 : Optional[float]
+    gspc_close : Optional[float]
+    gspc_poc1 : Optional[float]
+    ixic_close : Optional[float]
+    ixic_poc1 : Optional[float]
+    vix_close : Optional[float]
+    vix_poc1 : Optional[float]
+
+class StatPoc6(BaseModel):
+    bcli_poc6 : Optional[float]
+    cpi_poc6 : Optional[float]
+    gdpt_poc6 : Optional[float]
+    grb_poc6 : Optional[float]
+    inf_poc6 : Optional[float]
+    ipi_poc6 : Optional[float]
+    lt_ir_poc6 : Optional[float]
+    ppi_poc6 : Optional[float]
+    st_ir_poc6 : Optional[float]
+    ur_poc6 : Optional[float]
+    wrt_poc6 : Optional[float]
+    dji_close : Optional[float]
+    dji_poc6 : Optional[float]
+    gspc_close : Optional[float]
+    gspc_poc6 : Optional[float]
+    ixic_close : Optional[float]
+    ixic_poc6 : Optional[float]
+    vix_close : Optional[float]
+    vix_poc6 : Optional[float]
+
+class StatPoc12(BaseModel):
+    bcli_poc12 : Optional[float]
+    cpi_poc12 : Optional[float]
+    gdpt_poc12 : Optional[float]
+    grb_poc12 : Optional[float]
+    inf_poc12 : Optional[float]
+    ipi_poc12 : Optional[float]
+    lt_ir_poc12 : Optional[float]
+    ppi_poc12 : Optional[float]
+    st_ir_poc12 : Optional[float]
+    ur_poc12 : Optional[float]
+    wrt_poc12 : Optional[float]
+    dji_close : Optional[float]
+    dji_poc12 : Optional[float]
+    gspc_close : Optional[float]
+    gspc_poc12 : Optional[float]
+    ixic_close : Optional[float]
+    ixic_poc12 : Optional[float]
+    vix_close : Optional[float]
+    vix_poc12 : Optional[float]
+
+class Month(BaseModel):
+    month: datetime
