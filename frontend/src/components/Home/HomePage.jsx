@@ -2,6 +2,7 @@ import { Button, Flex, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/r
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import { MacroIndex } from './MacroIndex'
 import { FngGauge } from './FngGauge'
+import { LineChart } from './LineChart'
 
 
 export const HomePage = () => {
@@ -40,7 +41,7 @@ export const HomePage = () => {
                 <FngGauge/>
             </Flex>
             <Flex flex={1}>
-                chart
+                <LineChart/>
             </Flex>
         </Flex>
     </Flex>
