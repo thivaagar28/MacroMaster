@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 #import database models
 from app.models.users_model import Users
+from app.models.usa_model import USA
 
 #import application router
 from app.api.api_v1.router import router
@@ -21,7 +22,8 @@ async def lifespan(app: FastAPI):
     await init_beanie(
         database=db_client,
         document_models=[
-            Users
+            Users,
+            USA
         ],  # add your models here
     )
     #above are executed during initialization of the application
