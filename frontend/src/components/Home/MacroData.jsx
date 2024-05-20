@@ -1,6 +1,5 @@
-import { Box, SimpleGrid } from '@chakra-ui/react'
+import { SimpleGrid } from '@chakra-ui/react'
 import { MacroStat } from './MacroStat'
-import { IndexStat } from './IndexStat'
 
 export const MacroData = () => {
   return (
@@ -15,7 +14,6 @@ export const MacroData = () => {
       <MacroStat name='Unemployment Rate'/>
       <MacroStat name='Producer Price Index (PPI)'/>
       <MacroStat name='Trade In Goods'/>
-      <MacroStat name='Share Price'/>
       <MacroStat name='Business Cycle Indicators (BCI)'/>
     </SimpleGrid>
   )
