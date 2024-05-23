@@ -54,7 +54,7 @@ export const DefaultLayout = ({children}) => {
       <Flex w="full"
       h="full"
       flexDirection="column"
-      position="relative" px={2} py={3}>
+      position="relative" px={2} pt={1}>
         <Flex alignContent={'center'} justifyContent={'space-between'} px={4}>
           <Flex flexDir={"column"}>
             <Text >The New Approach</Text>
@@ -67,7 +67,7 @@ export const DefaultLayout = ({children}) => {
             </Tooltip>
           </Flex>
         </Flex>
-        <Flex h={'full'} p={2} position={'relative'} justifyContent={'center'} alignItems={'center'}>{children}</Flex>
+        <Flex h={'full'} px={2} pt={2} position={'relative'} justifyContent={'center'} alignItems={'center'}>{children}</Flex>
         </Flex>
     </HStack>
         
