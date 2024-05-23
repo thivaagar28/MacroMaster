@@ -1,11 +1,133 @@
-import { Button, Flex, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react'
+import { Button, Flex, Menu, MenuButton, MenuItem, MenuList, useToast } from '@chakra-ui/react'
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import { MacroIndex } from './MacroIndex'
-import { FngGauge } from './FngGauge'
 import { LineChart } from './LineChart'
-
+import {useEffect, useRef, useState} from 'react'
+import axiosInstance from '../../services/axios';
+import { FeatureChart } from './FeatureChart'
+import { CompositeChart } from './CompositeChart'
 
 export const HomePage = () => {
+    const isMounted = useRef(false);
+    const [loading, setLoading] = useState(true);
+
+    const [monthlist, setMonthlist] = useState([]);
+    const [selectedMonth, setSelectedMonth] = useState('Period');
+    const [selectedMeasure, setSelectedMeasure] = useState('Measure');
+    const [selectedCountry, setSelectedCountry] = useState('Select Country');
+    const [statData, setStatData] = useState();
+    const toast = useToast();
+    const refreshPage = () => {
+        window.location.reload(false);
+    }
+
+    const fetchMonth = () =>{
+        setLoading(true);
+        let url = ''
+        let country = ''
+
+        if (selectedCountry === 'USA'){
+            country = 'usa'
+        } else if (selectedCountry === 'Malaysia'){
+            country = 'malaysia'
+        } else{
+            return
+        }
+        
+        if(selectedMeasure === 'MoM'){
+            url = '/' + country + '/poc1_months'
+        } else if (selectedMeasure === 'HF'){
+            url = '/' + country + '/poc6_months'
+        } else if (selectedMeasure === 'YoY'){
+            url = '/' + country + '/poc12_months'   
+        } else{
+            url = null
+            return
+        }
+
+        axiosInstance.get(url).then((res) => {
+            setMonthlist(res.data);
+        }).catch((err) => {
+        console.error(err);
+            toast({
+                title: "Something went wrong. Page will be reloaded in few seconds",
+                status: 'error',
+                isClosable: 'true',
+                duration: 1500
+            });
+            setTimeout( refreshPage, 2000);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }
+
+    const handleCountryClick = (country) =>{
+        setSelectedCountry(country);
+    }
+
+    const handleMonthClick = (month) =>{
+        setSelectedMonth(month.month);
+    }
+
+    const handleMeasureClick = (measure) =>{
+        setSelectedMeasure(measure);
+        fetchMonth(measure);
+    }
+
+    const fetch_stat = () =>{
+        if(selectedMeasure !== 'Period'){
+            setLoading(true);
+            let url = ''
+            if(selectedMeasure === 'MoM'){
+                url = '/' + selectedCountry.toLowerCase() +'/'+ selectedMonth +'/poc1'
+            } else if (selectedMeasure === 'YoY'){
+                url = '/' + selectedCountry.toLowerCase() +'/'+ selectedMonth +'/poc12'
+            } else{
+                url = null
+                return
+            }
+
+            axiosInstance.get(url).then((res) => {
+                setStatData(res.data);
+            }).catch((err) => {
+                console.error(err);
+                toast({
+                    title: "Something went wrong. Page will be reloaded in few seconds",
+                    status: 'error',
+                    isClosable: 'true',
+                    duration: 1500
+                });
+                setTimeout( refreshPage, 2000);
+            }).finally(() => {
+                setLoading(false);
+            });
+        }
+    }
+
+    const default_settings = () => {
+        setSelectedCountry('USA');
+        handleMeasureClick('MoM');
+        setSelectedMonth('May 24');
+    }
+
+    useEffect(() => {
+        if(!isMounted.current) return;
+        fetchMonth();
+    }, [selectedCountry, selectedMeasure]);
+
+    useEffect(() => {
+        if(!isMounted.current) return;
+        fetch_stat();
+    }, [selectedCountry, selectedMonth, selectedMeasure]);
+
+    
+  
+    useEffect(() => {
+        if(isMounted.current) return;
+        default_settings();
+        isMounted.current = true;
+    }, []);
+
   return (
     <Flex w={'full'} h={'full'} flexDir={'column'}>
         <Flex justifyContent={'flex-start'}>
@@ -13,11 +135,25 @@ export const HomePage = () => {
                 {({ isOpen }) => (
                     <>
                     <MenuButton mr={4} size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
-                        Select Country
+                        {selectedCountry}
                     </MenuButton>
                     <MenuList size={'sm'}>
-                        <MenuItem >Malaysia</MenuItem>
-                        <MenuItem onClick={() => alert('Kagebunshin')}>USA (Global)</MenuItem>
+                        <MenuItem onClick={() => handleCountryClick('Malaysia')} >Malaysia</MenuItem>
+                        <MenuItem onClick={() => handleCountryClick('USA')}>USA (Global)</MenuItem>
+                    </MenuList>
+                    </>
+                )}
+            </Menu>
+            <Menu>
+                {({ isOpen }) => (
+                    <>
+                    <MenuButton mr={4} size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
+                        {selectedMonth}
+                    </MenuButton>
+                    <MenuList maxHeight={"60vh"} overflowY={"scroll"}>
+                        {monthlist.map((month, index) => (
+                            <MenuItem key={index} onClick={() => handleMonthClick({month})} >{month}</MenuItem>
+                        ))}
                     </MenuList>
                     </>
                 )}
@@ -26,22 +162,23 @@ export const HomePage = () => {
                 {({ isOpen }) => (
                     <>
                     <MenuButton size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
-                        Period
+                        {selectedMeasure}
                     </MenuButton>
                     <MenuList>
-                        <MenuItem>...</MenuItem>
+                        <MenuItem onClick={() => handleMeasureClick('MoM')}>MoM (1 month)</MenuItem>
+                        <MenuItem onClick={() => handleMeasureClick('YoY')}>YoY (12 months)</MenuItem>
                     </MenuList>
                     </>
                 )}
             </Menu>
         </Flex>
-        <MacroIndex/>
+        <MacroIndex data={statData} country={selectedCountry}/>
         <Flex flex={1} pt={3}>
             <Flex w={'45%'} justifyContent={'center'}>
-                <FngGauge/>
+                <FeatureChart country={selectedCountry} measure={selectedMeasure}/>
             </Flex>
             <Flex flex={1}>
-                <LineChart/>
+                <CompositeChart country={selectedCountry} measure={selectedMeasure} />
             </Flex>
         </Flex>
     </Flex>
