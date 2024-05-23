@@ -31,7 +31,7 @@ export const LineChart = () => {
       size: 0,
     },
     title: {
-      text: 'S&P 500 Index',
+      text: 'Features Selected for USA Composite Index (MoM)',
       align: 'middle'
     },
     fill: {
@@ -96,7 +96,7 @@ export const LineChart = () => {
   }])
   return (
     <Flex flex={1}>
-      <Chart options={options} series={series} type="area" height={'100%'} width={'700'}/>
+      <Chart options={options} series={series} type="area" height={'100%'} width={'500'}/>
     </Flex>
   )
 }
