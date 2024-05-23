@@ -15,7 +15,7 @@ export const IndexStat = ({index_name = 'Index Name', ticker='Ticker', desc='Ind
         </Flex>
         <StatNumber>$ {value}</StatNumber>
         <StatHelpText >
-          <StatArrow type='increase' />
+          {perc > 0 ? <StatArrow type='increase' /> : <StatArrow type='decrease' /> }
           {perc} %
         </StatHelpText>
       </Stat>
