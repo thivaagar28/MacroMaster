@@ -29,14 +29,16 @@ class Malaysia(Document):
     wrt_poc12 : Optional[float] = Field(None)
     klse_close : Optional[float] = Field(None)
     klse_poc1 : Optional[float] = Field(None)
+    klse_n_poc1 : Optional[float] = Field(None)
     klse_poc12 : Optional[float] = Field(None)
-    cmpt_poc1 : Optional[float] = Field(None)
-    cmpt_poc12 : Optional[float] = Field(None)
-    pred_cmpt_poc1 : Optional[float] = Field(None)
-    pred_cmpt_poc12 : Optional[float] = Field(None)
+    klse_n_poc12 : Optional[float] = Field(None)
+    MarketMood_poc1 : Optional[float] = Field(None)
+    MarketMood_poc12 : Optional[float] = Field(None)
+    pred_MarketMood_poc1 : Optional[float] = Field(None)
+    pred_MarketMood_poc12 : Optional[float] = Field(None)
 
     def __repr__(self) -> str:
-        return f"<USA {self.month}>"
+        return f"<Malaysia {self.month}>"
     
     def __str__(self) -> str:
         return str(self.month)
