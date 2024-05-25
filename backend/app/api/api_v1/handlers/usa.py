@@ -1,19 +1,27 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException, status, Depends
 import pymongo
 from typing import List
 from bson import datetime as bson_datetime
 from typing import Any
+import math
+from fastapi.responses import StreamingResponse
+from motor.motor_asyncio import AsyncIOMotorClient
+import pandas as pd
+import io
 
 #import database models, service and schema
 from app.models.usa_model import USA
-from app.schemas.usa_schema import StandardStat, FeatureGraphPoc1, FeatureGraphPoc12, CmptPoc
+from app.schemas.usa_schema import StandardStat, MarketMoodPoc, MMIndexpoc
 from app.services.usa_service import USAService
 
 usa_router = APIRouter()
 
 def rounder(value, mul = 1):
     return (value if value == None else round(value * mul, 2))
+
+def floor(value, mul = 1):
+    return (value if value == None else math.floor(value * mul))
 
 @usa_router.get('/poc1_months', summary="Get all month list for poc1" , response_model=List[str])
 async def month_list_poc1():
@@ -83,6 +91,147 @@ async def get_stat_poc12(month: str):
     )
     return response
 
+@usa_router.get('/mm_poc1', summary="Get market mood for poc1", response_model=MarketMoodPoc)
+async def get_mm_poc1():
+    cut_offdate = await USAService.get_cutoff_date()
+    m1 = cut_offdate - timedelta(1) # remove 1 month
+    y1 = cut_offdate - timedelta(31 * 11) # remove 12 month
+
+    data = await USAService.get_poc1_mm()
+    transformed_data = MarketMoodPoc()
+
+    # Define the target months
+    target_months = {
+        cut_offdate.strftime("%b %y"),
+        m1.strftime("%b %y"),
+        y1.strftime("%b %y")
+    }
+
+    # Append only the target months
+    for item in data:
+        item_month_str = item.month.strftime("%b %y")
+        if item_month_str in target_months:
+            transformed_data.month.append(item_month_str)
+            transformed_data.MarketMood.append(rounder(item.MarketMood_poc1, 100))
+            
+            # Remove the appended month from target_months to avoid redundant checks
+            target_months.remove(item_month_str)
+
+        # Break the loop if all target months are found
+        if not target_months:
+            break
+
+    return transformed_data
+    '''
+    for item in data:
+        transformed_data.month.append(item.month.strftime("%b %y"))
+        transformed_data.MarketMood.append(rounder(item.MarketMood_poc1, 100))
+    return transformed_data
+    '''
+
+
+
+@usa_router.get('/mm_poc12', summary="Get market mood for poc12", response_model=MarketMoodPoc)
+async def get_mm_poc12():
+    cut_offdate = await USAService.get_cutoff_date()
+    m1 = cut_offdate - timedelta(1) # remove 1 month
+    y1 = cut_offdate - timedelta(31 * 11) # remove 12 month
+
+
+    data = await USAService.get_poc12_mm()
+    transformed_data = MarketMoodPoc()
+
+    # Define the target months
+    target_months = {
+        cut_offdate.strftime("%b %y"),
+        m1.strftime("%b %y"),
+        y1.strftime("%b %y")
+    }
+
+    # Append only the target months
+    for item in data:
+        item_month_str = item.month.strftime("%b %y")
+        if item_month_str in target_months:
+            transformed_data.month.append(item_month_str)
+            transformed_data.MarketMood.append(rounder(item.MarketMood_poc12, 100))
+            
+            # Remove the appended month from target_months to avoid redundant checks
+            target_months.remove(item_month_str)
+
+        # Break the loop if all target months are found
+        if not target_months:
+            break
+
+    return transformed_data
+
+    '''
+    for item in data:
+        transformed_data.month.append(item.month.strftime("%b %y"))
+        transformed_data.MarketMood.append(rounder(item.MarketMood_poc12, 100))
+    return transformed_data
+    '''
+
+@usa_router.get('/mmi_poc1', summary="Get market mood and indices for poc1", response_model=MMIndexpoc)
+async def get_mmi_poc1():
+    data = await USAService.get_poc1_mmi()
+     # Slice the data to include only the last 15 items
+    data = data[-15:]
+    transformed_data = MMIndexpoc()
+    for item in data:
+        transformed_data.month.append(item.month.strftime("%b %y"))
+        transformed_data.dji.append(floor(item.dji_n_poc1, 100))
+        transformed_data.gspc.append(floor(item.gspc_n_poc1, 100))
+        transformed_data.ixic.append(floor(item.ixic_n_poc1, 100))
+        transformed_data.vix.append(floor(item.vix_n_poc1, 100))
+        transformed_data.MarketMood.append(floor(item.MarketMood_poc1, 100))
+        transformed_data.pred_MarketMood.append(floor(item.pred_MarketMood_poc1, 100))
+
+    return transformed_data
+
+@usa_router.get('/mmi_poc12', summary="Get market mood and indices for poc12", response_model=MMIndexpoc)
+async def get_mmi_poc12():
+    data = await USAService.get_poc12_mmi()
+    # Slice the data to include only the last 20 items
+    data = data[-20:]
+    transformed_data = MMIndexpoc()
+    for item in data:
+        transformed_data.month.append(item.month.strftime("%b %y"))
+        transformed_data.dji.append(floor(item.dji_n_poc12, 100))
+        transformed_data.gspc.append(floor(item.gspc_n_poc12, 100))
+        transformed_data.ixic.append(floor(item.ixic_n_poc12, 100))
+        transformed_data.vix.append(floor(item.vix_n_poc12, 100))
+        transformed_data.MarketMood.append(floor(item.MarketMood_poc12, 100))
+        transformed_data.pred_MarketMood.append(floor(item.pred_MarketMood_poc12, 100))
+
+    return transformed_data
+
+@usa_router.get('/export_csv', summary="Export USA Collection as CSV")
+async def export_csv():
+    try:
+        # Fetch all documents from the USA collection
+        documents = await USAService.get_csv_data()
+
+        # Convert documents to pandas DataFrame
+        df = pd.DataFrame(documents)
+
+        # List of columns to drop
+        columns_to_drop = ['id', 'ixic_n_poc1', 'ixic_n_poc12', 'vix_n_poc1', 'vix_n_poc12', 'dji_n_poc1', 'dji_n_poc12', 'gspc_n_poc1', 'gspc_n_poc12'] 
+
+        df = df.drop(columns=columns_to_drop)
+
+        # Convert DataFrame to CSV
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        output.seek(0)
+        
+        # Create streaming response
+        response = StreamingResponse(io.BytesIO(output.getvalue().encode()), media_type="text/csv")
+        response.headers["Content-Disposition"] = "attachment; filename=USA_collection_export.csv"
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+'''
 @usa_router.get('/features_poc1', summary="Get features selected for poc1", response_model=FeatureGraphPoc1)
 async def get_features_poc1():
     data = await USAService.get_poc1_features()
@@ -131,3 +280,4 @@ async def get_features_poc1():
         transformed_data.cmpt.append(rounder(item.cmpt_poc12))
         transformed_data.pred_cmpt.append(rounder(item.pred_cmpt_poc12))
     return transformed_data
+'''
