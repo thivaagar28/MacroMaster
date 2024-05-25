@@ -1,11 +1,10 @@
 import { Button, Flex, Menu, MenuButton, MenuItem, MenuList, useToast } from '@chakra-ui/react'
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { FiChevronDown, FiChevronUp, FiDatabase } from 'react-icons/fi'
 import { MacroIndex } from './MacroIndex'
-import { LineChart } from './LineChart'
 import {useEffect, useRef, useState} from 'react'
 import axiosInstance from '../../services/axios';
-import { FeatureChart } from './FeatureChart'
-import { CompositeChart } from './CompositeChart'
+import { MoodGauge } from './MoodGauge'
+import { PredictionChart } from './PredictionChart'
 
 export const HomePage = () => {
     const isMounted = useRef(false);
@@ -71,7 +70,7 @@ export const HomePage = () => {
 
     const handleMeasureClick = (measure) =>{
         setSelectedMeasure(measure);
-        fetchMonth(measure);
+        fetchMonth();
     }
 
     const fetch_stat = () =>{
@@ -110,6 +109,25 @@ export const HomePage = () => {
         setSelectedMonth('May 24');
     }
 
+    const download_csv = async () =>{
+        try {
+            let response = await axiosInstance.get('/' + selectedCountry.toLowerCase() + '/export_csv', {
+                responseType: 'blob', // Important for handling binary data
+            });
+
+            const filename = selectedCountry.toLowerCase() + '_collection_export.csv'
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (error) {
+            console.error('There was an error with the download', error);
+        }
+    }
+
     useEffect(() => {
         if(!isMounted.current) return;
         fetchMonth();
@@ -130,55 +148,60 @@ export const HomePage = () => {
 
   return (
     <Flex w={'full'} h={'full'} flexDir={'column'}>
-        <Flex justifyContent={'flex-start'}>
-            <Menu>
-                {({ isOpen }) => (
-                    <>
-                    <MenuButton mr={4} size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
-                        {selectedCountry}
-                    </MenuButton>
-                    <MenuList size={'sm'}>
-                        <MenuItem onClick={() => handleCountryClick('Malaysia')} >Malaysia</MenuItem>
-                        <MenuItem onClick={() => handleCountryClick('USA')}>USA (Global)</MenuItem>
-                    </MenuList>
-                    </>
-                )}
-            </Menu>
-            <Menu>
-                {({ isOpen }) => (
-                    <>
-                    <MenuButton mr={4} size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
-                        {selectedMonth}
-                    </MenuButton>
-                    <MenuList maxHeight={"60vh"} overflowY={"scroll"}>
-                        {monthlist.map((month, index) => (
-                            <MenuItem key={index} onClick={() => handleMonthClick({month})} >{month}</MenuItem>
-                        ))}
-                    </MenuList>
-                    </>
-                )}
-            </Menu>
-            <Menu>
-                {({ isOpen }) => (
-                    <>
-                    <MenuButton size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
-                        {selectedMeasure}
-                    </MenuButton>
-                    <MenuList>
-                        <MenuItem onClick={() => handleMeasureClick('MoM')}>MoM (1 month)</MenuItem>
-                        <MenuItem onClick={() => handleMeasureClick('YoY')}>YoY (12 months)</MenuItem>
-                    </MenuList>
-                    </>
-                )}
-            </Menu>
+        <Flex justifyContent={'space-between'}>
+            <Flex justifyContent={'flex-start'}>
+                <Menu>
+                    {({ isOpen }) => (
+                        <>
+                        <MenuButton mr={4} size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
+                            {selectedCountry}
+                        </MenuButton>
+                        <MenuList size={'sm'}>
+                            <MenuItem onClick={() => handleCountryClick('Malaysia')} >Malaysia</MenuItem>
+                            <MenuItem onClick={() => handleCountryClick('USA')}>USA (Global)</MenuItem>
+                        </MenuList>
+                        </>
+                    )}
+                </Menu>
+                <Menu>
+                    {({ isOpen }) => (
+                        <>
+                        <MenuButton mr={4} size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
+                            {selectedMonth}
+                        </MenuButton>
+                        <MenuList maxHeight={"60vh"} overflowY={"scroll"}>
+                            {monthlist.map((month, index) => (
+                                <MenuItem key={index} onClick={() => handleMonthClick({month})} >{month}</MenuItem>
+                            ))}
+                        </MenuList>
+                        </>
+                    )}
+                </Menu>
+                <Menu>
+                    {({ isOpen }) => (
+                        <>
+                        <MenuButton size={'sm'} isActive={isOpen} as={Button} rightIcon={ isOpen ? <FiChevronUp strokeWidth={3} color={'#d4a600'}/> : <FiChevronDown strokeWidth={3} color={'#d4a600'}/>} >
+                            {selectedMeasure}
+                        </MenuButton>
+                        <MenuList>
+                            <MenuItem onClick={() => handleMeasureClick('MoM')}>MoM (1 month)</MenuItem>
+                            <MenuItem onClick={() => handleMeasureClick('YoY')}>YoY (12 months)</MenuItem>
+                        </MenuList>
+                        </>
+                    )}
+                </Menu>
+            </Flex>
+            <Button rightIcon={<FiDatabase />} size={'sm'} variant='outline' onClick={download_csv}>
+                Download CSV
+            </Button>
         </Flex>
         <MacroIndex data={statData} country={selectedCountry}/>
         <Flex flex={1} pt={3}>
             <Flex w={'45%'} justifyContent={'center'}>
-                <FeatureChart country={selectedCountry} measure={selectedMeasure}/>
+                <MoodGauge country={selectedCountry} measure={selectedMeasure}/>
             </Flex>
             <Flex flex={1}>
-                <CompositeChart country={selectedCountry} measure={selectedMeasure} />
+                <PredictionChart country={selectedCountry} measure={selectedMeasure}/>
             </Flex>
         </Flex>
     </Flex>
