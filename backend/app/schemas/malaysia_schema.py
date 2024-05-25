@@ -53,6 +53,38 @@ class StandardStat(BaseModel):
     klse_close : Optional[float]
     klse : Optional[float]
 
+class MarketMoodPoc1(BaseModel):
+    month : datetime
+    MarketMood_poc1 : Optional[float]
+
+class MarketMoodPoc12(BaseModel):
+    month : datetime
+    MarketMood_poc12 : Optional[float]
+
+class MarketMoodPoc(BaseModel):
+    month : List[datetime] = Field(default_factory=list)
+    MarketMood : List[Optional[float]] = Field(default_factory=list)
+
+class MMIndexpoc1(BaseModel) :
+    month : datetime
+    klse_n_poc1 : Optional[float]
+    MarketMood_poc1 : Optional[float]
+    pred_MarketMood_poc1 : Optional[float]
+
+class MMIndexpoc12(BaseModel) :
+    month : datetime
+    klse_n_poc12 : Optional[float]
+    MarketMood_poc12 : Optional[float]
+    pred_MarketMood_poc12 : Optional[float]
+
+class MMIndexpoc(BaseModel):
+    month : List[datetime] = Field(default_factory=list)
+    klse : List[Optional[float]] = Field(default_factory=list)
+    MarketMood : List[Optional[float]] = Field(default_factory=list)
+    pred_MarketMood : List[Optional[float]] = Field(default_factory=list)
+
+
+'''
 class FeaturesPoc1(BaseModel):
     month : datetime
     bcli_poc1 : Optional[float]
@@ -99,3 +131,4 @@ class CmptPoc(BaseModel):
     month : List[datetime] = Field(default_factory=list)
     cmpt : List[Optional[float]] = Field(default_factory=list)
     pred_cmpt : List[Optional[float]] = Field(default_factory=list)
+'''
