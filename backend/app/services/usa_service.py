@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from bson import datetime as bson_datetime
 #import database models, schemes
 from app.models.usa_model import USA
-from app.schemas.usa_schema import StatPoc1, StatPoc12, Month, FeaturesPoc1, FeaturesPoc12, CmptPoc1, CmptPoc12
+from app.schemas.usa_schema import StatPoc1, StatPoc12, Month, MarketMoodPoc1, MarketMoodPoc12, MMIndexpoc1, MMIndexpoc12
 
 start_date = datetime.strptime('1992-01', '%Y-%m')
 cutoff_date = datetime.strptime('2024-05', '%Y-%m')
@@ -37,6 +37,36 @@ class USAService:
         return stat_poc12
     
     @staticmethod
+    async def get_poc1_mm() -> MarketMoodPoc1:
+        return await USA.find(USA.month >= start_date, USA.month <= cutoff_date).sort(-USA.month).to_list()
+
+    @staticmethod
+    async def get_poc12_mm() -> MarketMoodPoc12:
+        return await USA.find(USA.month >= start_date, USA.month <= cutoff_date).sort(-USA.month).to_list()
+    
+    @staticmethod
+    async def get_poc1_mmi() -> MMIndexpoc1:
+        temp_cutoff_date = cutoff_date + timedelta(31) # add 1 months
+        return await USA.find(USA.month >= start_date, USA.month <= temp_cutoff_date).sort(USA.month).to_list()
+
+    @staticmethod
+    async def get_poc12_mmi() -> MMIndexpoc12:
+        temp_cutoff_date = cutoff_date + timedelta(31 * 12) # add 12 months
+        return await USA.find(USA.month >= start_date, USA.month <= temp_cutoff_date).sort(USA.month).to_list()
+
+    @staticmethod
+    async def get_cutoff_date() -> datetime:
+        return cutoff_date
+
+    @staticmethod
+    async def get_csv_data():
+        # Fetch documents from the database and convert to dictionaries
+        instances = await USA.find().to_list()
+        data = [instance.model_dump() for instance in instances]
+        return data
+
+    '''
+    @staticmethod
     async def get_poc1_features() -> FeaturesPoc1:
         return await USA.find(USA.month >= feature_start_date, USA.month <= cutoff_date).sort(USA.month).to_list()
     
@@ -53,3 +83,4 @@ class USAService:
     async def get_poc12_cmpt() -> CmptPoc12:
         temp_cutoff_date = cutoff_date + timedelta(31 * 12) # add 12 months
         return await USA.find(USA.month >= feature_start_date, USA.month <= temp_cutoff_date).sort(USA.month).to_list()
+    '''        

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from bson import datetime as bson_datetime
 #import database models, schemes
 from app.models.malaysia_model import Malaysia
-from app.schemas.malaysia_schema import Month, StatPoc1, StatPoc12, FeaturesPoc1, FeaturesPoc12, CmptPoc1, CmptPoc12
+from app.schemas.malaysia_schema import Month, StatPoc1, StatPoc12, MarketMoodPoc1, MarketMoodPoc12, MMIndexpoc1, MMIndexpoc12
 
 start_date = datetime.strptime('2010-01', '%Y-%m')
 cutoff_date = datetime.strptime('2024-05', '%Y-%m')
@@ -37,6 +37,37 @@ class MalaysiaService:
         return stat_poc12
     
     @staticmethod
+    async def get_poc1_mm() -> MarketMoodPoc1:
+        return await Malaysia.find(Malaysia.month >= start_date, Malaysia.month <= cutoff_date).sort(-Malaysia.month).to_list()
+
+    @staticmethod
+    async def get_poc12_mm() -> MarketMoodPoc12:
+        return await Malaysia.find(Malaysia.month >= start_date, Malaysia.month <= cutoff_date).sort(-Malaysia.month).to_list()
+    
+    @staticmethod
+    async def get_poc1_mmi() -> MMIndexpoc1:
+        temp_cutoff_date = cutoff_date + timedelta(31) # add 1 months
+        return await Malaysia.find(Malaysia.month >= start_date, Malaysia.month <= temp_cutoff_date).sort(Malaysia.month).to_list()
+
+    @staticmethod
+    async def get_poc12_mmi() -> MMIndexpoc12:
+        temp_cutoff_date = cutoff_date + timedelta(31 * 12) # add 12 months
+        return await Malaysia.find(Malaysia.month >= start_date, Malaysia.month <= temp_cutoff_date).sort(Malaysia.month).to_list()
+
+    @staticmethod
+    async def get_cutoff_date() -> datetime:
+        return cutoff_date
+
+    @staticmethod
+    async def get_csv_data():
+        # Fetch documents from the database and convert to dictionaries
+        instances = await Malaysia.find().to_list()
+        data = [instance.model_dump() for instance in instances]
+        return data
+
+
+    '''
+    @staticmethod
     async def get_poc1_features() -> FeaturesPoc1:
         return await Malaysia.find(Malaysia.month >= feature_start_date, Malaysia.month <= cutoff_date).sort(Malaysia.month).to_list()
     
@@ -53,3 +84,4 @@ class MalaysiaService:
     async def get_poc12_cmpt() -> CmptPoc12:
         temp_cutoff_date = cutoff_date + timedelta(31 * 12) # add 12 months
         return await Malaysia.find(Malaysia.month >= feature_start_date, Malaysia.month <= temp_cutoff_date).sort(Malaysia.month).to_list()
+    '''
