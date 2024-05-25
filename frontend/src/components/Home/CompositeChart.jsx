@@ -22,6 +22,10 @@ export const CompositeChart = ({country, measure}) => {
         },
         foreColor: '#ffffff',
         },
+        stroke: {
+                width: [5,5,4],
+                curve: 'smooth'
+              },
         grid: {
         show : false
         },
@@ -109,10 +113,18 @@ export const CompositeChart = ({country, measure}) => {
 
                 // Transform the data
                 const categories = data.month;
-                const transformedSeries = Object.keys(data).filter(key => key !== 'month').map(key => ({
-                name: key.toUpperCase(),
-                data: data[key]
-                }));
+                let maxLength = categories.length;
+
+                const transformedSeries = Object.keys(data).filter(key => key !== 'month').map(key => {
+                    const seriesData = data[key];
+                    while (seriesData.length < maxLength) {
+                        seriesData.push(null); // Pad with null to ensure same length
+                    }
+                    return {
+                        name: key.toUpperCase(),
+                        data: seriesData
+                    };
+                });
 
                 // Determine the initial zoom range (last 12 data points)
                 const totalDataPoints = categories.length;
