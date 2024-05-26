@@ -1,4 +1,4 @@
-.apexcharts-tooltip {
+.apexcharts-tooltip, .apexcharts-menu-item {
     background: white;
     color: black !important;
 }
