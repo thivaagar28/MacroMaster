@@ -1,12 +1,15 @@
-import { Button, Flex, Menu, MenuButton, MenuItem, MenuList, useToast } from '@chakra-ui/react'
+import { Alert, AlertIcon, Box, Button, Divider, Flex, Image, Menu, MenuButton, MenuItem, MenuList, Skeleton, Stack, Text, useToast } from '@chakra-ui/react'
 import { FiChevronDown, FiChevronUp, FiDatabase } from 'react-icons/fi'
 import { MacroIndex } from './MacroIndex'
 import {useEffect, useRef, useState} from 'react'
 import axiosInstance from '../../services/axios';
 import { MoodGauge } from './MoodGauge'
 import { PredictionChart } from './PredictionChart'
+import { useAuth } from '../../hooks/useAuth';
 
 export const HomePage = () => {
+    const auth = useAuth();
+
     const isMounted = useRef(false);
     const [loading, setLoading] = useState(true);
 
@@ -125,6 +128,14 @@ export const HomePage = () => {
             link.parentNode.removeChild(link);
         } catch (error) {
             console.error('There was an error with the download', error);
+            if (error.response && error.response.status === 401) {
+                toast({
+                    title: "Please register/login to access premium features",
+                    status: 'error',
+                    isClosable: 'true',
+                    duration: 1500
+                });
+            } 
         }
     }
 
@@ -191,17 +202,54 @@ export const HomePage = () => {
                     )}
                 </Menu>
             </Flex>
+            {auth?.isAuthenticated ? 
             <Button rightIcon={<FiDatabase />} size={'sm'} variant='outline' onClick={download_csv}>
                 Download CSV
-            </Button>
+            </Button> :
+            <Alert status='info' width={'fit-content'} px={2} py={0} size={'sm'}>
+                <AlertIcon />
+                Register/Login to access premium features!
+            </Alert>
+            }
         </Flex>
         <MacroIndex data={statData} country={selectedCountry}/>
         <Flex flex={1} pt={3}>
             <Flex w={'45%'} justifyContent={'center'}>
-                <MoodGauge country={selectedCountry} measure={selectedMeasure}/>
+                {!auth?.isAuthenticated ?
+                <>
+                <Flex width={'full'} h={'full'} flexDir={'column'} alignItems={'center'}>
+                    <Box>
+                        <Text fontSize='lg' as={'b'}>{selectedCountry} Market Mood</Text>
+                        <Divider/>
+                    </Box>
+                    <Flex h={'full'} alignItems={'center'} justifyContent={'center'}>
+                        <Alert status='info' width={'94%'} h={'fit-content'} justifyContent={'center'} borderRadius={5}>
+                        <AlertIcon />
+                            Register/Login to access premium features!
+                        </Alert>
+                    </Flex>
+                </Flex>
+                </> : <MoodGauge country={selectedCountry} measure={selectedMeasure}/>
+                }
+                
             </Flex>
             <Flex flex={1}>
-                <PredictionChart country={selectedCountry} measure={selectedMeasure}/>
+                {!auth?.isAuthenticated ?
+                <>
+                <Flex width={'full'} h={'full'} flexDir={'column'} alignItems={'center'}>
+                    <Box>
+                        <Text fontSize='lg' as={'b'}>{selectedCountry} Market Mood Prediction ({selectedMeasure})</Text>
+                        <Divider/>
+                    </Box>
+                    <Flex h={'full'} alignItems={'center'} justifyContent={'center'}>
+                        <Alert status='info' width={'94%'} h={'fit-content'} justifyContent={'center'} borderRadius={5}>
+                        <AlertIcon />
+                            Register/Login to access premium features!
+                        </Alert>
+                    </Flex>
+                </Flex>
+                </> : <PredictionChart country={selectedCountry} measure={selectedMeasure}/>
+                }
             </Flex>
         </Flex>
     </Flex>
