@@ -14,6 +14,9 @@ import io
 from app.models.usa_model import USA
 from app.schemas.usa_schema import StandardStat, MarketMoodPoc, MMIndexpoc
 from app.services.usa_service import USAService
+from app.models.users_model import Users
+# import custom user dependency
+from app.api.deps.user_deps import get_current_user
 
 usa_router = APIRouter()
 
@@ -92,7 +95,7 @@ async def get_stat_poc12(month: str):
     return response
 
 @usa_router.get('/mm_poc1', summary="Get market mood for poc1", response_model=MarketMoodPoc)
-async def get_mm_poc1():
+async def get_mm_poc1(user: Users = Depends(get_current_user)):
     cut_offdate = await USAService.get_cutoff_date()
     m1 = cut_offdate - timedelta(1) # remove 1 month
     y1 = cut_offdate - timedelta(31 * 11) # remove 12 month
@@ -132,7 +135,7 @@ async def get_mm_poc1():
 
 
 @usa_router.get('/mm_poc12', summary="Get market mood for poc12", response_model=MarketMoodPoc)
-async def get_mm_poc12():
+async def get_mm_poc12(user: Users = Depends(get_current_user)):
     cut_offdate = await USAService.get_cutoff_date()
     m1 = cut_offdate - timedelta(1) # remove 1 month
     y1 = cut_offdate - timedelta(31 * 11) # remove 12 month
@@ -172,7 +175,7 @@ async def get_mm_poc12():
     '''
 
 @usa_router.get('/mmi_poc1', summary="Get market mood and indices for poc1", response_model=MMIndexpoc)
-async def get_mmi_poc1():
+async def get_mmi_poc1(user: Users = Depends(get_current_user)):
     data = await USAService.get_poc1_mmi()
      # Slice the data to include only the last 15 items
     data = data[-15:]
@@ -189,7 +192,7 @@ async def get_mmi_poc1():
     return transformed_data
 
 @usa_router.get('/mmi_poc12', summary="Get market mood and indices for poc12", response_model=MMIndexpoc)
-async def get_mmi_poc12():
+async def get_mmi_poc12(user: Users = Depends(get_current_user)):
     data = await USAService.get_poc12_mmi()
     # Slice the data to include only the last 20 items
     data = data[-20:]
@@ -206,7 +209,7 @@ async def get_mmi_poc12():
     return transformed_data
 
 @usa_router.get('/export_csv', summary="Export USA Collection as CSV")
-async def export_csv():
+async def export_csv(user: Users = Depends(get_current_user)):
     try:
         # Fetch all documents from the USA collection
         documents = await USAService.get_csv_data()

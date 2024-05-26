@@ -14,6 +14,9 @@ import math
 from app.models.malaysia_model import Malaysia
 from app.services.malaysia_service import MalaysiaService
 from app.schemas.malaysia_schema import StandardStat, MarketMoodPoc, MMIndexpoc
+from app.models.users_model import Users
+# import custom user dependency
+from app.api.deps.user_deps import get_current_user
 
 malaysia_router = APIRouter()
 
@@ -81,7 +84,7 @@ async def get_stat_poc12(month: str):
     return response
 
 @malaysia_router.get('/mm_poc1', summary="Get market mood for poc1", response_model=MarketMoodPoc)
-async def get_mm_poc1():
+async def get_mm_poc1(user: Users = Depends(get_current_user)):
     cut_offdate = await MalaysiaService.get_cutoff_date()
     m1 = cut_offdate - timedelta(1) # remove 1 month
     y1 = cut_offdate - timedelta(31 * 11) # remove 12 month
@@ -120,7 +123,7 @@ async def get_mm_poc1():
 
 
 @malaysia_router.get('/mm_poc12', summary="Get market mood for poc12", response_model=MarketMoodPoc)
-async def get_mm_poc12():
+async def get_mm_poc12(user: Users = Depends(get_current_user)):
     cut_offdate = await MalaysiaService.get_cutoff_date()
     m1 = cut_offdate - timedelta(1) # remove 1 month
     y1 = cut_offdate - timedelta(31 * 11) # remove 12 month
@@ -161,7 +164,7 @@ async def get_mm_poc12():
 
 
 @malaysia_router.get('/mmi_poc1', summary="Get market mood and indices for poc1", response_model=MMIndexpoc)
-async def get_mmi_poc1():
+async def get_mmi_poc1(user: Users = Depends(get_current_user)):
     data = await MalaysiaService.get_poc1_mmi()
     # Slice the data to include only the last 15 items
     data = data[-15:]
@@ -175,7 +178,7 @@ async def get_mmi_poc1():
     return transformed_data
 
 @malaysia_router.get('/mmi_poc12', summary="Get market mood and indices for poc12", response_model=MMIndexpoc)
-async def get_mmi_poc12():
+async def get_mmi_poc12(user: Users = Depends(get_current_user)):
     data = await MalaysiaService.get_poc12_mmi()
     # Slice the data to include only the last 20 items
     data = data[-20:]
@@ -189,7 +192,7 @@ async def get_mmi_poc12():
     return transformed_data
 
 @malaysia_router.get('/export_csv', summary="Export Malaysia Collection as CSV")
-async def export_csv():
+async def export_csv(user: Users = Depends(get_current_user)):
     try:
         # Fetch all documents from the USA collection
         documents = await MalaysiaService.get_csv_data()
