@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Text } from '@chakra-ui/react'
+import { Box, Divider, Flex, Text, useToast } from '@chakra-ui/react'
 import GaugeComponent from 'react-gauge-component';
 import { useState, useEffect } from 'react';
 import axiosInstance from '../../services/axios';
@@ -8,6 +8,7 @@ export const MoodGauge = ({country, measure}) => {
     const [value, setValue] = useState();
     const [monthValue, setMonthValue] = useState();
     const [yearValue, setYearValue] = useState();
+    const toast = useToast();
 
     useEffect(() => {
         console.log('running effect')
@@ -29,6 +30,14 @@ export const MoodGauge = ({country, measure}) => {
 
         }).catch((err) => {
             console.error(err);
+            if (err.response && err.response.status === 401) {
+                toast({
+                    title: "Please register/login to access premium features",
+                    status: 'error',
+                    isClosable: 'true',
+                    duration: 1500
+                });
+            } 
         }).finally(() => {
             console.log('done');
         })}
@@ -39,7 +48,7 @@ export const MoodGauge = ({country, measure}) => {
   return (
     <Flex w={'full'} justifyContent={'center'} alignItems={'center'} flexDir={'column'}>
         <Box>
-            <Text fontSize='lg' as={'b'}>Market Mood</Text>
+            <Text fontSize='lg' as={'b'}>{country} Market Mood</Text>
             <Divider/>
         </Box>
         <Box height={'80%'} width={'80%'}>

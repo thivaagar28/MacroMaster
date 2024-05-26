@@ -1,9 +1,12 @@
-import { Flex } from '@chakra-ui/react';
+import { Flex, useToast } from '@chakra-ui/react';
 import axiosInstance from '../../services/axios';
 import {useEffect, useState} from 'react'
 import Chart from "react-apexcharts";
+import './linechart.css'
 
 export const PredictionChart = ({country, measure}) => {
+
+    const toast = useToast();
 
     const name_changer = (name) =>{
         if(name === 'MarketMood')
@@ -91,7 +94,7 @@ export const PredictionChart = ({country, measure}) => {
                 });
 
                 //title
-                const title = 'Market Mood Prediction for '+ country +'  (' + measure + ')';
+                const title = country + ' Market Mood Prediction (' + measure + ')';
 
                 // Update state with the transformed data
                 setOptions((prevOptions) => ({
@@ -106,6 +109,14 @@ export const PredictionChart = ({country, measure}) => {
 
             }).catch((err) => {
                 console.error(err);
+                if (err.response && err.response.status === 401) {
+                toast({
+                    title: "Please register/login to access premium features",
+                    status: 'error',
+                    isClosable: 'true',
+                    duration: 1500
+                });
+            }
             }).finally(() => {
                 console.log('finally');
             });
