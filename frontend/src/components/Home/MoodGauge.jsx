@@ -59,15 +59,15 @@ export const MoodGauge = ({country, measure}) => {
                     // gradient: true,
                     subArcs: [
                     {
-                        limit: 15,
-                        color: '#EA4228',
+                        limit: 33,
+                        color: '#5BE12C',
                         showTick: true,
                         tooltip: {
-                        text: 'Market is Hot!'
+                        text: 'Market is Neutral!'
                         },
                     },
                     {
-                        limit: 35,
+                        limit: 65,
                         color: '#F5CD19',
                         showTick: true,
                         tooltip: {
@@ -75,23 +75,15 @@ export const MoodGauge = ({country, measure}) => {
                         }
                     },
                     {
-                        limit: 65,
-                        color: '#5BE12C',
-                        showTick: true,
+                        limit: 85, color: '#Ffa500', showTick: true,
                         tooltip: {
-                        text: 'Neutral'
-                        }
-                    },
-                    {
-                        limit: 85, color: '#F5CD19', showTick: true,
-                        tooltip: {
-                        text: 'Lightly Volatile...'
+                        text: 'Market is getting Hot...'
                         }
                     },
                     {
                         color: '#EA4228',
                         tooltip: {
-                        text: 'Market is Hot!'
+                        text: 'Hot!!!'
                         }
                     }
                     ]
