@@ -7,6 +7,7 @@ from typing import Any
 from fastapi.responses import StreamingResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 import pandas as pd
+import numpy as np
 import io
 import math
 
@@ -214,6 +215,94 @@ async def export_csv(user: Users = Depends(get_current_user)):
         response = StreamingResponse(io.BytesIO(output.getvalue().encode()), media_type="text/csv")
         response.headers["Content-Disposition"] = "attachment; filename=Malaysia_collection_export.csv"
         return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@malaysia_router.get('/{index}', summary="Get index data")
+async def get_index_data(index: str, user: Users = Depends(get_current_user)):
+    try:
+        # Fetch all documents from the USA collection
+        documents = await MalaysiaService.get_csv_data()
+
+        # Convert documents to pandas DataFrame
+        df = pd.DataFrame(documents)
+
+        cut_offdate = await MalaysiaService.get_cutoff_date()
+        df = df[df['month'] <= cut_offdate]
+
+        df = df.where(pd.notnull(df), None)
+        #df = df.replace([np.inf, -np.inf], np.nan)
+        #df = df.dropna()
+
+        df['month'] = pd.to_datetime(df['month'])
+        df['month'] = df['month'].dt.strftime("%b %y")
+
+        # Convert all float values to strings
+        df = df.applymap(lambda x: str(x) if isinstance(x, float) else x)
+
+        #create a empty_dict
+
+        empty_dict = {}
+
+        if index == "cpi":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "cpi" : df['cpi_index'].tolist()
+            }
+        elif index == "inf":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "inflation_rate" : df['inf_poc1'].tolist()
+            }
+        elif index == "gr":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "government_reserves" : df['grb_index'].tolist()
+            }
+        elif index == "ipi":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "ipi" : df['ipi_index'].tolist()
+            }
+        elif index == "lt_ir":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "long_term_interest_rate" : df['lt_ir_poc1'].tolist()
+            }
+        elif index == "st_ir":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "short_term_interest_rate" : df['st_ir_poc1'].tolist()
+            }
+        elif index == "gdp":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "gdp" : df['gdpt_index'].tolist()
+            }
+        elif index == "ur":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "unemployment_rate" : df['ur_poc1'].tolist()
+            }
+        elif index == "ppi":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "ppi" : df['ppi_index'].tolist()
+            }
+        elif index == "wrt":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "wholesale_retail_trade" : df['wrt_index'].tolist()
+            }
+        elif index == "bcli":
+            empty_dict = {
+                "month" : df['month'].tolist(),
+                "business_cycle_leading_indicator" : df['bcli_index'].tolist()
+            }
+        else :
+            return None
+
+        return empty_dict
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
