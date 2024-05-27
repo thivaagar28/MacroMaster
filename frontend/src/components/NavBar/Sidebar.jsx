@@ -22,7 +22,7 @@ export const Sidebar = ({collapse, setCollapse}) => {
       </Flex>
       <NavItem collapse={collapse} icon={FiHome} title={"Dashboard"} path='/' />
       {auth?.isAuthenticated && <><NavItem collapse={collapse} icon={FiUser} title={"Account"} path='/account_settings'/>
-      <NavItem collapse={collapse} icon={FiSettings} title={"Settings"} />
+      {/*<NavItem collapse={collapse} icon={FiSettings} title={"Settings"} />*/}
       </>}
     </Box>
     <Flex p={'5%'} flexDir={'column'}w={'100%'} alignItems={collapse ? "center" : 'center'} mb={2}>
