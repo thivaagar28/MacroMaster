@@ -8,6 +8,8 @@ import { AuthConsumer, AuthProvider} from './context/JWTAuthContext'
 import { Flex, Spinner } from '@chakra-ui/react';
 import { AccountSettings } from './components/User/AccountSettings';
 import { HomePage } from './components/Home/HomePage';
+import { StatView } from './components/StatView/StatView.jsx'
+
 
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
                 <Route path='/login' element={<PublicRoute><Login/></PublicRoute>}/>
                 <Route path='/register' element={<PublicRoute><Register/></PublicRoute>}/>
                 <Route path='/account_settings' element={<AuthRoute><AccountSettings/></AuthRoute>}/>
+                <Route path='/stat_view' element={<AuthRoute><StatView/></AuthRoute>}/>
               </Routes>
               </DefaultLayout>
             )}
