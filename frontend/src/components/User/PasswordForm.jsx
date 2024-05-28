@@ -19,6 +19,10 @@ export const PasswordForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const refreshPage = () => {
+        window.location.reload(false);
+    }
+
     // function to submit form
     const submitForm = async (values) => {
       console.log(values);
@@ -30,6 +34,7 @@ export const PasswordForm = () => {
           isClosable: 'true',
           duration: 1500
         });
+        setTimeout( refreshPage, 2000);
       } catch (error) {
         if (error.response && error.response.status === 401) {
             navigate('/login', { replace: true, state: { from: location } });
