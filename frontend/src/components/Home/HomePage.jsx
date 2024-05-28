@@ -206,7 +206,7 @@ export const HomePage = () => {
             <Button rightIcon={<FiDatabase />} size={'sm'} variant='outline' onClick={download_csv}>
                 Download CSV
             </Button> :
-            <Alert status='info' width={'fit-content'} px={2} py={0} size={'sm'}>
+            <Alert status='info' width={'fit-content'} px={2} py={0} size={'sm'} borderRadius={5}>
                 <AlertIcon />
                 Register/Login to access premium features!
             </Alert>
@@ -217,13 +217,13 @@ export const HomePage = () => {
             <Flex w={'45%'} justifyContent={'center'}>
                 {!auth?.isAuthenticated ?
                 <>
-                <Flex width={'full'} h={'full'} flexDir={'column'} alignItems={'center'}>
+                <Flex width={'full'} h={'full'} flexDir={'column'} alignItems={'center'} bgImage={"GaugeBlur.png"} bgPosition={'center'} bgRepeat={'no-repeat'} bgSize={'cover'} >
                     <Box>
                         <Text fontSize='lg' as={'b'}>{selectedCountry} Market Mood</Text>
                         <Divider/>
                     </Box>
                     <Flex h={'full'} alignItems={'center'} justifyContent={'center'}>
-                        <Alert status='info' width={'94%'} h={'fit-content'} justifyContent={'center'} borderRadius={5}>
+                        <Alert status='info' variant={'solid'} width={'94%'} h={'fit-content'} justifyContent={'center'} borderRadius={5}>
                         <AlertIcon />
                             Register/Login to access premium features!
                         </Alert>
@@ -236,13 +236,13 @@ export const HomePage = () => {
             <Flex flex={1}>
                 {!auth?.isAuthenticated ?
                 <>
-                <Flex width={'full'} h={'full'} flexDir={'column'} alignItems={'center'}>
+                <Flex width={'full'} h={'full'} flexDir={'column'} alignItems={'center'} bgImage={"ChartBlur.png"} bgPosition={'center'} bgRepeat={'no-repeat'} bgSize={'cover'}>
                     <Box>
                         <Text fontSize='lg' as={'b'}>{selectedCountry} Market Mood Prediction ({selectedMeasure})</Text>
                         <Divider/>
                     </Box>
                     <Flex h={'full'} alignItems={'center'} justifyContent={'center'}>
-                        <Alert status='info' width={'94%'} h={'fit-content'} justifyContent={'center'} borderRadius={5}>
+                        <Alert status='info' variant={'solid'} width={'94%'} h={'fit-content'} justifyContent={'center'} borderRadius={5}>
                         <AlertIcon />
                             Register/Login to access premium features!
                         </Alert>
